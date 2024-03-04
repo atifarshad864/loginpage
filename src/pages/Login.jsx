@@ -1,22 +1,28 @@
 import React, { useState } from "react";
-import { FiMail, FiLock } from "react-icons/fi";
-import { SiGoogle, SiGithub } from "react-icons/si";
+import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { SiGoogle } from "react-icons/si";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 export const Login = (props) => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPass] = useState("");
+  const navigate = useNavigate();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password });
     try {
       const response = await axios.post(
         "http://192.168.100.171:5555/user/login",
         { email, password }
       );
-      console.log(response.data);
+      console.log(response);
       localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/dashboard");
     } catch (error) {
@@ -24,10 +30,13 @@ export const Login = (props) => {
       console.error(error);
     }
   };
+  const handleForgotPasswordClick = () => {
+    navigate("/forgotpassword");
+  };
 
   return (
-    <div className="min-h-screen flex justify-center items-center ">
-      <div className="bg-white shadow-md rounded-lg px-8 py-8 w-96 mb-14">
+    <div className="min-h-screen flex flex-col justify-center items-center">
+      <div className="bg-white shadow-md rounded-lg px-8 py-8 w-full max-w-md mb-14">
         <h2 className="text-3xl mb-6 font-bold text-center text-gray-800">
           Welcome Back!
         </h2>
@@ -56,55 +65,63 @@ export const Login = (props) => {
               <input
                 value={password}
                 onChange={(e) => setPass(e.target.value)}
-                type="password"
+                type={passwordVisible ? "text" : "password"}
                 placeholder="Password"
                 id="password"
                 name="password"
                 className="pl-10 pr-3 py-2 w-full border-2 rounded-md focus:outline-none focus:border-blue-500"
               />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+              >
+                {passwordVisible ? <FiEyeOff /> : <FiEye />}
+              </button>
             </div>
           </div>
           <div className="mb-6">
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-            >
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
               Log In
-            </button>
-            <div className="mt-4 text-center">
-              <button
-                className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-12"
-                onClick={() => props.onFormSwitch("login")}
-              >
-                <SiGoogle className="text-white mr-2" />
-                Continue with Google
-              </button>
-            </div>
-            <div className="mt-2 text-center">
-              <button className="flex items-center justify-center bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-12">
-                <SiGithub className="text-white mr-2" />
-                Continue with GitHub
-              </button>
-            </div>
-          </div>
-          <div className="text-center">
-            <button
-              className="text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
-              onClick={() => props.onFormSwitch("forgotPassword")}
-            >
-              Forgot password?
             </button>
           </div>
         </form>
-        <div className="mt-4 text-center">
-          <button
-            className="text-black text-sm focus:outline-none"
-            onClick={() => props.onFormSwitch("register")}
-          >
-            Don't have an account? Register here.
-          </button>
+        <div className="text-center">
+          <a href="http://192.168.100.171:5555/auth/google">
+            <button className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-12">
+              <SiGoogle className="text-white mr-2" />
+              Continue with Google
+            </button>
+          </a>
         </div>
       </div>
+      <div className="text-center">
+        <button
+          className="text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
+          onClick={handleForgotPasswordClick}
+        >
+          Forgot password?
+        </button>
+      </div>
+      <div className="mt-4 text-center">
+        <button
+          className="text-black text-sm focus:outline-none"
+          onClick={() => props.onFormSwitch("register")}
+        >
+          Don't have an account? Register here.
+        </button>
+      </div>
+      <GoogleOAuthProvider clientId="880773091106-fpksfbpgnnpk70evi7pmoro7teo6br3p.apps.googleusercontent.com">
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            const decoded = jwtDecode(credentialResponse.credential);
+            console.log(decoded);
+          }}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
+      </GoogleOAuthProvider>
     </div>
   );
 };

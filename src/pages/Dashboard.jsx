@@ -5,13 +5,14 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) {
-      navigate("/login");
+      navigate("/");
     }
   }, []);
 
   return (
     <div>
       <h1>Welcome to Home Page</h1>
+      <button onClick={() => navigate("/updateData")}>UpdateData</button>
     </div>
   );
 };

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+
 import axios from "axios";
 import {
   FiUser,
@@ -18,7 +20,7 @@ export const Register = (props) => {
   const [pass, setPass] = useState("");
   const [dob, setDob] = useState("");
   const [address, setAddress] = useState("");
-  const [profilePic, setProfilePic] = useState(null);
+  const [profilePic, setProfilePic] = useState("null");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState("");
 
@@ -53,9 +55,10 @@ export const Register = (props) => {
           },
         }
       );
-
+      props.onFormSwitch("login");
+      toast.success("Registration successful!");
       console.log("Registration Successful", response.data);
-      window.alert("Registration Successful");
+      // window.alert("Registration Successful");
     } catch (error) {
       console.error("Registration Error", error);
       window.alert("Registration Error");
@@ -67,6 +70,15 @@ export const Register = (props) => {
     setProfilePic(file);
   };
 
+  const empty = () => {
+    setName("");
+    setEmail("");
+    setPass("");
+    setDob("");
+    setAddress("");
+    setProfilePic("");
+  };
+
   return (
     <div className="min-h-screen flex justify-center items-center">
       <div className="bg-gray-200 shadow-md rounded-lg px-8 py-12 max-w-screen-xl w-full sm:w-[800px]">
@@ -74,8 +86,8 @@ export const Register = (props) => {
           User Register
         </h2>
         <form className="register-form" onSubmit={handleSubmit}>
-          <div className="flex flex-wrap -mx-3 mb-4">
-            <div className="w-full md:w-1/2 px-3 mb-4 md:mb-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mb-4">
               <label
                 htmlFor="name"
                 className=" text-gray-700 flex items-center"
@@ -91,7 +103,7 @@ export const Register = (props) => {
                 placeholder="Full Name"
               />
             </div>
-            <div className="w-full md:w-1/2 px-3">
+            <div className="mb-4">
               <label
                 htmlFor="email"
                 className=" text-gray-700 flex items-center"
@@ -109,9 +121,7 @@ export const Register = (props) => {
                 name="email"
               />
             </div>
-          </div>
-          <div className="flex flex-wrap -mx-3 mb-4">
-            <div className="w-full md:w-1/2 px-3 mb-4 md:mb-0">
+            <div className="mb-4">
               <label
                 htmlFor="password"
                 className=" text-gray-700 flex items-center"
@@ -138,7 +148,7 @@ export const Register = (props) => {
                 </button>
               </div>
             </div>
-            <div className="w-full md:w-1/2 px-3">
+            <div className="mb-4">
               <label htmlFor="dob" className=" text-gray-700 flex items-center">
                 <FiCalendar className="text-gray-500 mr-2" />
                 Date of Birth <span className="text-red-500">*</span>
@@ -152,61 +162,82 @@ export const Register = (props) => {
                 name="dob"
               />
             </div>
+            <div className="mb-4">
+              <label
+                htmlFor="address"
+                className=" text-gray-700 flex items-center"
+              >
+                <FiMapPin className="text-gray-500 mr-2" />
+                Address <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                className="form-textarea mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                id="address"
+                name="address"
+                rows="3"
+                placeholder="Your address..."
+              ></textarea>
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="profilePic"
+                className=" text-gray-700 flex items-center"
+              >
+                <FiCamera className="text-gray-500 mr-2" />
+                Profile Picture
+              </label>
+              <input
+                type="file"
+                id="profilePic"
+                name="profilePic"
+                onChange={handleFileChange}
+              />
+              {profilePic && (
+                <img
+                  src={
+                    profilePic !== "null"
+                      ? URL.createObjectURL(profilePic)
+                      : "Add Image"
+                  }
+                  alt="Add"
+                  className="mt-2 rounded-full w-14 h-14 object-cover"
+                />
+              )}
+            </div>
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="address"
-              className=" text-gray-700 flex items-center"
+          <div className="flex flex-col sm:flex-row justify-between">
+            <button
+              onClick={empty}
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
             >
-              <FiMapPin className="text-gray-500 mr-2" />
-              Address <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              className="form-textarea mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              id="address"
-              name="address"
-              rows="3"
-              placeholder="Your address..."
-            ></textarea>
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="profilePic"
-              className=" text-gray-700 flex items-center"
+              Reset
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
             >
-              <FiCamera className="text-gray-500 mr-2" />
-              Profile Picture
-            </label>
-            <input
-              type="file"
-              id="profilePic"
-              name="profilePic"
-              onChange={handleFileChange}
-            />
+              Register
+            </button>
+            <button
+              onClick={() => props.onFormSwitch("login")}
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
+            >
+              Back To Login
+            </button>
           </div>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-[19rem]"
-          >
-            Register
-          </button>
         </form>
         <div className="mt-4 text-center">
           <button
-            className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-60"
+            className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
             onClick={() => props.onFormSwitch("login")}
           >
             <SiGoogle className="text-white mr-2" />
             Continue with Google
-          </button>
-        </div>
-        <div className="mt-2 text-center">
-          <button className="flex items-center justify-center bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-60">
-            <SiGithub className="text-white mr-2" />
-            Continue with GitHub
           </button>
         </div>
       </div>
