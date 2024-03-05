@@ -13,7 +13,7 @@ const ForgotPassword = () => {
     try {
       console.log(resetEmail);
       const response = await axios.post(
-        "http://192.168.100.171:5555/user/forgetpassword",
+        "http://192.168.100.171:3000/user/forgetpassword",
         { email: resetEmail }
       );
 

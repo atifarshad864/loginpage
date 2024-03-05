@@ -1,25 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+// import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { SiGoogle } from "react-icons/si";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
 export const Login = (props) => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const error = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPass] = useState("");
-  const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://192.168.100.171:5555/user/login",
+        "http://192.168.100.171:3000/user/login",
         { email, password }
       );
       console.log(response);
@@ -33,12 +33,34 @@ export const Login = (props) => {
   const handleForgotPasswordClick = () => {
     navigate("/forgotpassword");
   };
+  const handleGoogleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      window.open("http://192.168.100.171:3000/auth/google", "_self");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("accessToken", token);
+      navigate("/update");
+    }
+  }, [token]);
+  let message = null;
+  if (token !== null) {
+    message = <h2>Token = {token}</h2>;
+  } else if (error !== null) {
+    message = <h2>Error = {error}</h2>;
+  }
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
       <div className="bg-white shadow-md rounded-lg px-8 py-8 w-full max-w-md mb-14">
         <h2 className="text-3xl mb-6 font-bold text-center text-gray-800">
           Welcome Back!
+          <br />
+          {message}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
@@ -87,12 +109,15 @@ export const Login = (props) => {
           </div>
         </form>
         <div className="text-center">
-          <a href="http://192.168.100.171:5555/auth/google">
-            <button className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-12">
-              <SiGoogle className="text-white mr-2" />
-              Continue with Google
-            </button>
-          </a>
+          {/* <a href="http://192.168.100.171:3000/auth/google"> */}
+          <button
+            onClick={handleGoogleLogin}
+            className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-12"
+          >
+            <SiGoogle className="text-white mr-2" />
+            Continue with Google
+          </button>
+          {/* </a> */}
         </div>
       </div>
       <div className="text-center">
@@ -111,17 +136,6 @@ export const Login = (props) => {
           Don't have an account? Register here.
         </button>
       </div>
-      <GoogleOAuthProvider clientId="880773091106-fpksfbpgnnpk70evi7pmoro7teo6br3p.apps.googleusercontent.com">
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            const decoded = jwtDecode(credentialResponse.credential);
-            console.log(decoded);
-          }}
-          onError={() => {
-            console.log("Login Failed");
-          }}
-        />
-      </GoogleOAuthProvider>
     </div>
   );
 };

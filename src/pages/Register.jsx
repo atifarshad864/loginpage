@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-
 import axios from "axios";
 import {
   FiUser,
@@ -13,7 +12,6 @@ import {
   FiEyeOff,
 } from "react-icons/fi";
 import { SiGoogle, SiGithub } from "react-icons/si"; // Importing Google and GitHub icons
-
 export const Register = (props) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +21,6 @@ export const Register = (props) => {
   const [profilePic, setProfilePic] = useState("null");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [error, setError] = useState("");
-
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -45,9 +42,8 @@ export const Register = (props) => {
       formData.append("dateofbirth", dob);
       formData.append("address", address);
       formData.append("image", profilePic);
-
       const response = await axios.post(
-        "http://192.168.100.171:5555/user/register",
+        "http://192.168.100.171:3000/user/register",
         formData,
         {
           headers: {
@@ -64,12 +60,10 @@ export const Register = (props) => {
       window.alert("Registration Error");
     }
   };
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setProfilePic(file);
   };
-
   const empty = () => {
     setName("");
     setEmail("");
@@ -78,7 +72,6 @@ export const Register = (props) => {
     setAddress("");
     setProfilePic("");
   };
-
   return (
     <div className="min-h-screen flex justify-center items-center">
       <div className="bg-gray-200 shadow-md rounded-lg px-8 py-12 max-w-screen-xl w-full sm:w-[800px]">
@@ -244,5 +237,4 @@ export const Register = (props) => {
     </div>
   );
 };
-
 export default Register;
