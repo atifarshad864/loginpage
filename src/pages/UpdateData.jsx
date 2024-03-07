@@ -26,7 +26,7 @@ const UpdateData = () => {
     const fetchUserDetails = async () => {
       try {
         const { data } = await axios.get(
-          "http://192.168.100.171:3000/user/record/",
+          "http://localhost:3001/user/record/",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -76,7 +76,7 @@ const UpdateData = () => {
       formData.append("image", image);
 
       const response = await axios.put(
-        "http://192.168.100.171:3000/user/update-user",
+        "http://localhost:3001/user/update-user",
         formData,
         {
           headers: {
@@ -226,7 +226,7 @@ const UpdateData = () => {
             ) : (
               <img
                 key={image}
-                src={`http://192.168.100.171:3000/images/${image}`}
+                src={`http://localhost:3001/images/${image}`}
                 alt="image"
                 className="mt-2 rounded-full w-14 h-14 object-cover"
               />

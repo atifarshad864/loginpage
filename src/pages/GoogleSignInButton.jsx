@@ -4,7 +4,7 @@ import { SiGoogle } from "react-icons/si";
 
 const GoogleSignInButton = () => {
   const handleGoogleLogin = () => {
-    window.open("http://192.168.100.171:3000/auth/google", "_self");
+    window.open("http://localhost:3001/auth/google", "_self");
   };
 
   const checkTokenValidity = () => {

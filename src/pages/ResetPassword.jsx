@@ -26,7 +26,7 @@ const ResetPassword = () => {
       console.log(localStorage.getItem("resetToken"));
       const token = localStorage.getItem("resetToken");
       const response = await axios.post(
-        "http://192.168.100.171:3000/user/resetpassword",
+        "http://localhost:3001/user/resetpassword",
         { token, newpassword: resetPassword },
         {
           headers: {

@@ -7,23 +7,26 @@ import {
   FiLock,
   FiCalendar,
   FiMapPin,
-  FiCamera,
-  FiEye,
-  FiEyeOff,
+  FiCamera
+  // FiEye,
+  // FiEyeOff,
 } from "react-icons/fi";
-import { SiGoogle, SiGithub } from "react-icons/si"; // Importing Google and GitHub icons
-export const Register = (props) => {
+import { SiGoogle } from "react-icons/si";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../components/buttons/Button";
+import { InputFields } from "../components/textField/InputFields";
+import { PasswordInput } from "../components/textField/PasswordInput";
+export const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [dob, setDob] = useState("");
   const [address, setAddress] = useState("");
   const [profilePic, setProfilePic] = useState("null");
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  
+  const navigate = useNavigate();
   const [error, setError] = useState("");
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
-  };
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !pass || !dob || !address) {
@@ -43,7 +46,7 @@ export const Register = (props) => {
       formData.append("address", address);
       formData.append("image", profilePic);
       const response = await axios.post(
-        "http://192.168.100.171:3000/user/register",
+        "http://localhost:3001/user/register",
         formData,
         {
           headers: {
@@ -51,21 +54,19 @@ export const Register = (props) => {
           },
         }
       );
-      console.log(response);
-      if (
-        response.data &&
-        response.data.status === "error" &&
-        response.data.error === "email already in use"
-      ) {
-        window.alert("Email already exists in the database.");
+      if (response.data && response.data.status === "error") {
+        if (response.data.error === "email already in use") {
+          window.alert("Email already exists in the database.");
+        } else {
+          throw new Error(response.data.error); // Throw error for unexpected errors
+        }
       } else {
-        props.onFormSwitch("login");
+        navigate("/login");
         toast.success("Registration successful!");
-        console.log("Registration Successful", response.data);
       }
     } catch (error) {
-      console.error("Registration Error", error);
-      window.alert("Registration Error");
+      console.error("Registration Error:", error); // Log the error for debugging
+      window.alert("Registration Error: " + error.message);
     }
   };
 
@@ -89,41 +90,38 @@ export const Register = (props) => {
         </h2>
         <form className="register-form" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+           
+            <InputFields
+              id="name"
+              icon={<FiUser className="text-gray-500 mr-2" />}
+              isRequired
+              label="Full Name"
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full Name" />
             <div className="mb-4">
-              <label
-                htmlFor="name"
-                className=" text-gray-700 flex items-center"
-              >
-                <FiUser className="text-gray-500 mr-2" />
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                className="form-input mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                id="name"
-                placeholder="Full Name"
+              <InputFields 
+              id="email"
+              icon={<FiMail className="text-gray-500 mr-2" />}
+              isRequired
+              label="Email"
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="youremail@gmail.com"
               />
             </div>
-            <div className="mb-4">
-              <label
-                htmlFor="email"
-                className=" text-gray-700 flex items-center"
-              >
-                <FiMail className="text-gray-500 mr-2" />
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                className="form-input mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="youremail@gmail.com"
-                id="email"
-                name="email"
-              />
-            </div>
-            <div className="mb-4">
+            <div className="relative">
+            <InputFields
+              id="pass"
+              icon={<FiLock className="text-gray-500 mr-2" />}
+              isRequired
+              label="Password"
+              onChange={(e) => setPass(e.target.value)}
+              placeholder= "*******"
+              
+            />
+             <PasswordInput />
+             </div>
+          
+            {/* <div className="mb-4">
               <label
                 htmlFor="password"
                 className=" text-gray-700 flex items-center"
@@ -149,7 +147,7 @@ export const Register = (props) => {
                   {passwordVisible ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
-            </div>
+            </div> */}
             <div className="mb-4">
               <label htmlFor="dob" className=" text-gray-700 flex items-center">
                 <FiCalendar className="text-gray-500 mr-2" />
@@ -164,7 +162,22 @@ export const Register = (props) => {
                 name="dob"
               />
             </div>
+            {/* <textarea></textarea> */}
             <div className="mb-4">
+              <InputFields
+            
+              className="form-textarea mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded" 
+              id="address"
+              icon={<FiMapPin className="text-gray-500 mr-2" />}
+              isRequired
+              label="Address"
+              rows = "5"
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Your address..."
+              />
+             
+            </div>
+            {/* <div className="mb-4">
               <label
                 htmlFor="address"
                 className=" text-gray-700 flex items-center"
@@ -181,7 +194,7 @@ export const Register = (props) => {
                 rows="3"
                 placeholder="Your address..."
               ></textarea>
-            </div>
+            </div> */}
             <div className="mb-4">
               <label
                 htmlFor="profilePic"
@@ -217,30 +230,19 @@ export const Register = (props) => {
             >
               Reset
             </button>
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
-            >
+            <Button type='submit'>
               Register
-            </button>
-            <button
-              onClick={() => props.onFormSwitch("login")}
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
-            >
-              Back To Login
-            </button>
+            </Button>
+            <Button onClick={() => navigate("/login")}>Back To Login</Button>
           </div>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         </form>
         <div className="mt-4 text-center">
-          <button
-            className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
-            onClick={() => props.onFormSwitch("login")}
-          >
+          <Button className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto" onClick={() => navigate("/login")}>
+
             <SiGoogle className="text-white mr-2" />
             Continue with Google
-          </button>
+          </Button>
         </div>
       </div>
     </div>

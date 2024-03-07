@@ -4,7 +4,7 @@ import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { SiGoogle } from "react-icons/si";
 import axios from "axios";
 
-export const Login = (props) => {
+export const Login = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const error = searchParams.get("error");
@@ -20,13 +20,15 @@ export const Login = (props) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://192.168.100.171:3000/user/login",
+        "http://localhost:3001/user/login",
         { email, password }
       );
+      if (response.data.status === 'error') 
+        throw new Error(response.data.error)
       localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/dashboard");
     } catch (error) {
-      alert("Service Error");
+      alert(error.message);
       console.error(error);
     }
   };
@@ -38,7 +40,7 @@ export const Login = (props) => {
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
     try {
-      window.open("http://192.168.100.171:3000/auth/google", "_self");
+      window.open("http://localhost:3001/auth/google", "_self");
     } catch (error) {
       console.error(error);
     }
@@ -130,7 +132,7 @@ export const Login = (props) => {
               </button>
               <button
                 className="text-black text-sm mt-4 focus:outline-none"
-                onClick={() => props.onFormSwitch("register")}
+                onClick={() => navigate("/register")}
               >
                 Don't have an account? Register here.
               </button>
