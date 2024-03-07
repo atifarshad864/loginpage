@@ -30,10 +30,10 @@ export const Register = (props) => {
       setError("All fields are required.");
       return;
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError("Invalid email format.");
-      return;
-    }
+    // if (!/\S+@\S+\.\S+/.test(email)) {
+    //   setError("Invalid email format.");
+    //   return;
+    // }
     try {
       const formData = new FormData();
       formData.append("email", email);
@@ -51,15 +51,24 @@ export const Register = (props) => {
           },
         }
       );
-      props.onFormSwitch("login");
-      toast.success("Registration successful!");
-      console.log("Registration Successful", response.data);
-      // window.alert("Registration Successful");
+      console.log(response);
+      if (
+        response.data &&
+        response.data.status === "error" &&
+        response.data.error === "email already in use"
+      ) {
+        window.alert("Email already exists in the database.");
+      } else {
+        props.onFormSwitch("login");
+        toast.success("Registration successful!");
+        console.log("Registration Successful", response.data);
+      }
     } catch (error) {
       console.error("Registration Error", error);
       window.alert("Registration Error");
     }
   };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setProfilePic(file);

@@ -100,8 +100,8 @@ const UpdateData = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="bg-gray-200 shadow-md rounded-lg px-8 py-12 max-w-screen-xl w-full sm:w-[800px]">
+    <div className="flex justify-center items-center min-h-screen sm:ml-20">
+      <div className="bg-white shadow-md rounded-lg px-5 py-8 max-w-screen-md w-full">
         <h2 className="text-3xl mb-6 font-bold text-center text-gray-800">
           Update
         </h2>
@@ -235,7 +235,7 @@ const UpdateData = () => {
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-[19rem]"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 font-bold rounded focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-[19rem]"
           >
             Update
           </button>
