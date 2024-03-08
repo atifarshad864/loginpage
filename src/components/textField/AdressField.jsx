@@ -1,4 +1,6 @@
-export const InputFields = ({
+import React from "react";
+
+export const AdressField = ({
   label,
   spanStyles,
   inputStyles,
@@ -8,30 +10,30 @@ export const InputFields = ({
   onChange,
   id,
   placeholder,
-  type,
+  rows,
 }) => {
   return (
     <div className="mb-4">
       {label && (
         <label
           htmlFor={id}
-          className={"text-gray-700 flex items-center " + spanStyles}
+          className={"text-gray-700 flex items-center" + spanStyles}
         >
           {icon}
           {label} {isRequired && <span className="text-red-500">*</span>}
         </label>
       )}
-      <input
+      <textarea
         className={
-          "form-input mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded " +
-          inputStyles
+          "form-textarea mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded" +
+          +inputStyles
         }
         value={value}
         onChange={onChange}
         id={id}
         placeholder={placeholder}
-        type={type}
-      />
+        rows={rows}
+      ></textarea>
     </div>
   );
 };

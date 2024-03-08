@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { SiGoogle } from "react-icons/si";
 import axios from "axios";
-
+import { Button } from "../components/buttons/Button";
 export const Login = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -19,12 +19,12 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:3001/user/login",
-        { email, password }
-      );
-      if (response.data.status === 'error') 
-        throw new Error(response.data.error)
+      const response = await axios.post("http://localhost:3001/user/login", {
+        email,
+        password,
+      });
+      if (response.data.status === "error")
+        throw new Error(response.data.error);
       localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/dashboard");
     } catch (error) {
@@ -41,6 +41,7 @@ export const Login = () => {
     e.preventDefault();
     try {
       window.open("http://localhost:3001/auth/google", "_self");
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
     }
@@ -62,7 +63,7 @@ export const Login = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center max-h-screen ml-9">
+      <div className="flex justify-center items-center h-screen">
         <div className="bg-white shadow-md rounded-lg px-8 py-8 w-full max-w-md mb-14">
           <h2 className="text-3xl mb-6 font-bold text-center text-gray-800">
             Welcome Back!
@@ -114,16 +115,7 @@ export const Login = () => {
                 Log In
               </button>
             </div>
-            <div className="text-center">
-              <button
-                onClick={handleGoogleLogin}
-                className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-12"
-              >
-                <SiGoogle className="text-white mr-2" />
-                Continue with Google
-              </button>
-            </div>
-            <div className="text-center flex flex-col mt-4">
+            <div className="text-center flex flex-col">
               <button
                 className="text-blue-500 hover:text-blue-700 text-sm focus:outline-none"
                 onClick={handleForgotPasswordClick}
@@ -136,6 +128,15 @@ export const Login = () => {
               >
                 Don't have an account? Register here.
               </button>
+              <div className="mt-4 flex justify-center">
+                <Button
+                  onClick={handleGoogleLogin}
+                  className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-3"
+                >
+                  <SiGoogle className="text-white mr-3" />
+                  Continue with Google
+                </Button>
+              </div>
             </div>
           </form>
         </div>

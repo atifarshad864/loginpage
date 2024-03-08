@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const ForgotPassword = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetToken, setResetToken] = useState("");
-  const navigate = useNavigate(); // Use the useNavigate hook to get navigation functions
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
