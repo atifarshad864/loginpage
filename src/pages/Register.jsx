@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import { useFormik } from "formik";
+import { SiGoogle } from "react-icons/si";
+import { RegisterSchema } from "../schemas";
+import { Button } from "../components/buttons/Button";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   FiUser,
   FiMail,
@@ -11,48 +16,43 @@ import {
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
-import { SiGoogle } from "react-icons/si";
-import { useNavigate } from "react-router-dom";
-import { Button } from "../components/buttons/Button";
+
 import {
   spanStyles,
   iconStyles,
   labelStyles,
   inputField,
   addressField,
+  imageStyle,
 } from "../utils/commonStyles";
-export const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [dob, setDob] = useState("");
-  const [address, setAddress] = useState("");
-  const [profilePic, setProfilePic] = useState("null");
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // do not restart the page
-    if (!name || !email || !pass || !dob || !address) {
-      setError("All fields are required.");
-      return;
-    }
-    // if (!/\S+@\S+\.\S+/.test(email)) {
-    //   setError("Invalid email format.");
-    //   return;
-    // }
+export const Register = () => {
+  const [profilePic, setProfilePic] = useState(null);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const error = searchParams.get("error");
+  const navigate = useNavigate();
+  const initialValues = {
+    name: "",
+    email: "",
+    password: "",
+    dob: "",
+    address: "",
+    profilePic: null,
+  };
+  const handleSubmit = async (values) => {
     try {
       const formData = new FormData();
-      formData.append("email", email);
-      formData.append("name", name);
-      formData.append("password", pass);
-      formData.append("dateofbirth", dob);
-      formData.append("address", address);
-      formData.append("image", profilePic);
+      formData.append("email", values.email);
+      formData.append("name", values.name);
+      formData.append("password", values.password);
+      formData.append("dateofbirth", values.dob);
+      formData.append("address", values.address);
+      formData.append("image", values.profilePic);
+
       const response = await axios.post(
-        // fetch data from api here
-        "http://localhost:3001/user/register",
+        "http://localhost:3000/user/register",
         formData,
         {
           headers: {
@@ -60,54 +60,80 @@ export const Register = () => {
           },
         }
       );
+      console.log(response.data);
       if (response.data && response.data.status === "error") {
         if (response.data.error === "email already in use") {
           window.alert("Email already exists in the database.");
         } else {
-          throw new Error(response.data.error); // Throw error for unexpected errors
+          throw new Error(response.data.error); // Throw Error for Unexpected errors
         }
       } else {
         navigate("/login");
         toast.success("Registration successful!");
       }
     } catch (error) {
-      console.error("Registration Error:", error); // Log the error for debugging
+      console.error("Registration Error:", error);
       window.alert("Registration Error: " + error.message);
     }
   };
-
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: RegisterSchema,
+    onSubmit: handleSubmit,
+  });
+  console.log(formik);
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setProfilePic(file);
+    formik.setFieldValue("profilePic", e.target.files[0]);
+    setProfilePic(e);
   };
+
   const togglePasswordVisibility = () => {
+    formik.setFieldValue("passwordVisible", !formik.values.passwordVisible);
     setPasswordVisible(!passwordVisible);
   };
-  const empty = () => {
-    setName("");
-    setEmail("");
-    setPass("");
-    setDob("");
-    setAddress("");
-    setProfilePic(null);
+  const handleGoogleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      window.open("http://localhost:3001/auth/google", "_self");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("accessToken", token);
+      navigate("/dashboard");
+    }
+  }, [token]);
+
+  let message = null;
+  if (token !== null) {
+    message = <h2>Token = {token}</h2>;
+  } else if (error !== null) {
+    message = <h2>Error = {error}</h2>;
+  }
+  const handleReset = () => {
+    formik.resetForm();
   };
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="bg-gray-200 shadow-md rounded-lg px-8 py-12 max-w-screen-xl w-full sm:w-[800px]">
+      <div className="bg-gray-200 opacity-100 shadow-md rounded-lg px-8 py-12 max-w-screen-xl w-full sm:w-[800px]">
         <h2 className="text-3xl mb-6 font-bold text-center text-gray-800">
           User Register
         </h2>
-        <form className="register-form" onSubmit={handleSubmit}>
+        <form className="register-form" onSubmit={formik.handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="mb-4">
               <label htmlFor="name" className={labelStyles.label}>
                 <FiUser className={iconStyles.icon} />
-                Full Name <span className={spanStyles.required}>*</span>
+                Full Name<span className={spanStyles.required}>*</span>
               </label>
               <input
                 className={inputField.field}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formik.values.name}
+                onChange={formik.handleChange}
                 id="name"
                 placeholder="Full Name"
               />
@@ -119,8 +145,8 @@ export const Register = () => {
               </label>
               <input
                 className={inputField.field}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formik.values.email}
+                onChange={formik.handleChange}
                 type="email"
                 placeholder="youremail@gmail.com"
                 id="email"
@@ -134,8 +160,8 @@ export const Register = () => {
               </label>
               <div className="relative">
                 <input
-                  value={pass}
-                  onChange={(e) => setPass(e.target.value)}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
                   type={passwordVisible ? "text" : "password"}
                   placeholder="********"
                   id="password"
@@ -158,8 +184,8 @@ export const Register = () => {
               </label>
               <input
                 className={inputField.field}
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
+                value={formik.values.dob}
+                onChange={formik.handleChange}
                 type="date"
                 id="dob"
                 name="dob"
@@ -172,8 +198,8 @@ export const Register = () => {
               </label>
               <textarea
                 className={addressField.addressStyle}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={formik.values.address}
+                onChange={formik.handleChange}
                 id="address"
                 name="address"
                 rows="3"
@@ -191,39 +217,41 @@ export const Register = () => {
                 name="profilePic"
                 onChange={handleFileChange}
               />
-              {profilePic && (
+              {formik.values.profilePic && (
                 <img
                   src={
                     profilePic !== "null"
-                      ? URL.createObjectURL(profilePic)
+                      ? URL.createObjectURL(formik.values.profilePic)
                       : "Add Image"
                   }
                   alt="Add"
-                  className="mt-2 rounded-full w-14 h-14 object-cover"
+                  className={imageStyle.image}
                 />
               )}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row justify-between">
-            <button
-              onClick={empty}
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
-            >
+            <Button type="button" onClick={handleReset}>
               Reset
-            </button>
-
+            </Button>
             <Button type="submit">Register</Button>
+
             <Button onClick={() => navigate("/login")}>Back To Login</Button>
           </div>
-          {error && (
-            <p className="{spanStyles.required} text-sm mb-4">{error}</p>
+          {Object.keys(formik.errors).length > 0 && (
+            <div>
+              {Object.values(formik.errors).map((error, index) => (
+                <p key={index} className="text-red-500 text-sm">
+                  {error}
+                </p>
+              ))}
+            </div>
           )}
         </form>
         <div className="mt-4 flex justify-center">
           <Button
             className="flex items-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline sm:w-auto"
-            onClick={() => navigate("/login")}
+            onClick={handleGoogleLogin}
           >
             <SiGoogle className="text-white mr-2" />
             Continue with Google

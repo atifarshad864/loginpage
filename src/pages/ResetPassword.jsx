@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import { Button } from "../components/buttons/Button";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import toast, { Toaster } from "react-hot-toast";
+import { inputField } from "../utils/commonStyles";
 const ResetPassword = () => {
   const [resetPassword, setResetPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [resetToken, setResetToken] = useState("");
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const ResetPassword = () => {
       );
 
       console.log(response.data);
-      alert("Reset password successful");
+      toast.success("Password Successfully Reset");
       window.location.href = "/";
     } catch (error) {
       alert("Service Error");
@@ -44,16 +48,35 @@ const ResetPassword = () => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
   return (
     <div className="container">
       <form onSubmit={handleSubmit}>
-        <input
-          type="password"
-          placeholder="Password"
-          value={resetPassword}
-          onChange={(e) => setResetPassword(e.target.value)}
-        />
-        <button type="submit">Reset Password</button>
+        <div className="relative">
+          <input
+            value={resetPassword}
+            onChange={(e) => setResetPassword(e.target.value)}
+            type={passwordVisible ? "text" : "password"}
+            placeholder="********"
+            id="password"
+            name="password"
+            className={inputField.field}
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+          >
+            {passwordVisible ? <FiEyeOff /> : <FiEye />}
+          </button>
+        </div>
+
+        <div className="text-center mt-6">
+          <Button type="submit">Reset Password</Button>
+        </div>
       </form>
     </div>
   );

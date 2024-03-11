@@ -19,10 +19,13 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3001/user/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://192.168.100.171:3000/user/login",
+        {
+          email,
+          password,
+        }
+      );
       if (response.data.status === "error")
         throw new Error(response.data.error);
       localStorage.setItem("accessToken", response.data.accessToken);

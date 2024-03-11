@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { FiMail } from "react-icons/fi";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import ResetPassword from "./ResetPassword";
+import { Button } from "../components/buttons/Button";
 const ForgotPassword = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetToken, setResetToken] = useState("");
@@ -18,7 +17,7 @@ const ForgotPassword = () => {
       );
 
       console.log(response.data);
-      setResetToken(response.data.token); // Set the reset token received from the server
+      setResetToken(response.data.token);
       alert("Reset password email sent successfully");
     } catch (error) {
       alert("Service Error");
@@ -26,32 +25,25 @@ const ForgotPassword = () => {
     }
   };
 
-  // Redirect to reset password page if token exists
   if (resetToken) {
-    navigate(`/reset-password?token=${resetToken}`); // Use navigate function to redirect
+    navigate(`/reset-password?token=${resetToken}`);
   }
 
   return (
     <div className="mb-6">
       <form onSubmit={handleSubmit}>
-        <div className="relative">
-          <span className="text-gray-400">
-            <FiMail />
-          </span>
+        <div className="text-center">
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Please Enter Email"
             value={resetEmail}
             onChange={(e) => setResetEmail(e.target.value)}
-            className="pl-5 pr-3 py-2 w-80 border-2 rounded-md focus:outline-none focus:border-blue-500"
+            className="pl-5 pr-3 py-2 w-80 border-2 rounded-md focus:outline-none focus:border-blue-500 max-sm:mt-48 md:mt-48 sm:mt-48"
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-        >
-          Send Email
-        </button>
+        <div className="text-center mt-6">
+          <Button type="submit">Send Email</Button>
+        </div>
       </form>
     </div>
   );

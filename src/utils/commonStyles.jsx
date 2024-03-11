@@ -18,3 +18,7 @@ export const addressField = {
   addressStyle:
     "form-textarea mt-1 w-full bg-gray-100 hover:bg-blue-100 focus:bg-white px-4 py-2 rounded",
 };
+
+export const imageStyle = {
+  image: "mt-2 rounded-full w-14 h-14 object-cover",
+};
