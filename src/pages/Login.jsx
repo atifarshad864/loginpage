@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { SiGoogle } from "react-icons/si";
+import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { Button } from "../components/buttons/Button";
 export const Login = () => {
@@ -31,7 +32,7 @@ export const Login = () => {
       localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/dashboard");
     } catch (error) {
-      alert(error.message);
+      toast.error("Password invalid");
       console.error(error);
     }
   };

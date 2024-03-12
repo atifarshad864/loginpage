@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useFormik } from "formik";
 import { updateSchema } from "../schemas";
-
 import {
   FiUser,
   FiMail,
@@ -21,6 +20,8 @@ import {
   addressField,
   imageStyle,
 } from "../utils/commonStyles";
+import toast from "react-hot-toast";
+import { Navigate } from "react-router";
 const UpdateData = () => {
   const [image, setProfilePic] = useState();
   const [newImage, setNewimage] = useState(null);
@@ -78,10 +79,13 @@ const UpdateData = () => {
       );
 
       console.log("Update Successful", response.data);
-      window.alert("Update Successful");
+      // window.alert("Update Successful");
+      toast.success("Update successful");
+      Navigate("/");
     } catch (error) {
       console.error("Update Error", error);
-      window.alert("Update Error");
+      // window.alert("Update Error");
+      toast.error("Update Error");
     }
   };
 

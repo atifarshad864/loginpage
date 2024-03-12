@@ -9,6 +9,8 @@ import { Login } from "./pages/Login";
 import Register from "./pages/Register";
 import ParticleBackground from "./components/ParticleBackground/ParticleBackground";
 import LandingScreen from "./pages/LandingScreen";
+import Protected from "./pages/Protected";
+import Page404 from "./pages/PageError";
 function App() {
   return (
     <div className="container">
@@ -17,13 +19,21 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingScreen />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/updatedata" element={<UpdateData />} />
+        <Route
+          path="/dashboard"
+          element={<Protected Component={Dashboard} />}
+        />
+        <Route
+          path="/updatedata"
+          element={<Protected Component={UpdateData} />}
+        />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/resetpassword" element={<ResetPassword />} />
-        <Route path="/success" element={<Login />} />
-        <Route path="/error" element={<Error />} />
+        <Route
+          path="/resetpassword"
+          element={<Protected Component={ResetPassword} />}
+        />
         <Route path="/register" element={<Register />} />
+        <Route path="/*" element={<Page404 />} />
       </Routes>
     </div>
   );

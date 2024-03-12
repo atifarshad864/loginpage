@@ -1,77 +1,67 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Button } from "../components/buttons/Button";
+import React, { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import toast, { Toaster } from "react-hot-toast";
-import { inputField } from "../utils/commonStyles";
+import { Button } from "../components/buttons/Button";
+
 const ResetPassword = () => {
-  const [resetPassword, setResetPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [resetToken, setResetToken] = useState("");
 
-  useEffect(() => {
-    const handleResetPasswordToken = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get("token");
-
-      if (token) {
-        localStorage.setItem("resetToken", token);
-        setResetToken(token);
-      }
-    };
-
-    handleResetPasswordToken();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      console.log(resetPassword);
-      console.log(localStorage.getItem("resetToken"));
-      const token = localStorage.getItem("resetToken");
-      const response = await axios.post(
-        "http://localhost:3001/user/resetpassword",
-        { token, newpassword: resetPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log(response.data);
-      toast.success("Password Successfully Reset");
-      window.location.href = "/";
-    } catch (error) {
-      alert("Service Error");
-      console.error(error);
-    }
-  };
+  const formik = useFormik({
+    initialValues: {
+      resetPassword: "",
+    },
+    validationSchema: Yup.object({
+      resetPassword: Yup.string()
+        .required("Password is required")
+        .matches(
+          /^(?=.*[a-z])(?=.*[A-Z])/,
+          "Password must contain at least one uppercase letter and one lowercase letter"
+        )
+        .min(6, "Password must be at least 6 characters long"),
+    }),
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
 
   const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
+    setPasswordVisible((prev) => !prev);
   };
 
   return (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
+    <div className="container mx-auto">
+      <form onSubmit={formik.handleSubmit} className="w-64 mx-auto">
         <div className="relative">
+          <h1 className="text-center font-bold max-sm:mt-48 sm:mt-48">
+            Reset Your Password
+          </h1>
           <input
-            value={resetPassword}
-            onChange={(e) => setResetPassword(e.target.value)}
+            value={formik.values.resetPassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             type={passwordVisible ? "text" : "password"}
-            placeholder="********"
-            id="password"
-            name="password"
-            className={inputField.field}
+            placeholder="Please Reset Password"
+            id="resetPassword"
+            name="resetPassword"
+            className={`border border-gray-400 rounded px-3 py-2 mt-6 w-full ${
+              formik.touched.resetPassword && formik.errors.resetPassword
+                ? "border-red-500"
+                : ""
+            }`}
           />
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+            className="absolute top-[4rem] right-1 flex items-center px-3 text-gray-600"
           >
             {passwordVisible ? <FiEyeOff /> : <FiEye />}
           </button>
+          {formik.touched.resetPassword && formik.errors.resetPassword && (
+            <div className="text-red-500 text-xs mt-1">
+              {formik.errors.resetPassword}
+            </div>
+          )}
         </div>
 
         <div className="text-center mt-6">

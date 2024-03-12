@@ -122,6 +122,7 @@ export const Register = () => {
       <div className="bg-gray-200 opacity-100 shadow-md rounded-lg px-8 py-12 max-w-screen-xl w-full sm:w-[800px]">
         <h2 className="text-3xl mb-6 font-bold text-center text-gray-800">
           User Register
+          {message}
         </h2>
         <form className="register-form" onSubmit={formik.handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -137,6 +138,9 @@ export const Register = () => {
                 id="name"
                 placeholder="Full Name"
               />
+              {formik.touched.name && formik.errors.name ? (
+                <div className="text-red-500">{formik.errors.name}</div>
+              ) : null}
             </div>
             <div className="mb-4">
               <label htmlFor="email" className={labelStyles.label}>
@@ -152,6 +156,9 @@ export const Register = () => {
                 id="email"
                 name="email"
               />
+              {formik.touched.email && formik.errors.email ? (
+                <div className="text-red-500">{formik.errors.email}</div>
+              ) : null}
             </div>
             <div className="mb-4">
               <label htmlFor="password" className={labelStyles.label}>
@@ -168,10 +175,13 @@ export const Register = () => {
                   name="password"
                   className={inputField.field}
                 />
+                {formik.touched.password && formik.errors.password ? (
+                  <div className="text-red-500">{formik.errors.password}</div>
+                ) : null}
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+                  className="absolute top-[1rem] right-1 flex items-center px-3 text-gray-600"
                 >
                   {passwordVisible ? <FiEyeOff /> : <FiEye />}
                 </button>
@@ -190,6 +200,9 @@ export const Register = () => {
                 id="dob"
                 name="dob"
               />
+              {formik.touched.dob && formik.errors.dob ? (
+                <div className="text-red-500">{formik.errors.dob}</div>
+              ) : null}
             </div>
             <div className="mb-4">
               <label htmlFor="address" className={labelStyles.label}>
@@ -205,6 +218,9 @@ export const Register = () => {
                 rows="3"
                 placeholder="Your address..."
               ></textarea>
+              {formik.touched.address && formik.errors.address ? (
+                <div className="text-red-500">{formik.errors.address}</div>
+              ) : null}
             </div>
             <div className="mb-4">
               <label htmlFor="profilePic" className={labelStyles.label}>
@@ -217,6 +233,9 @@ export const Register = () => {
                 name="profilePic"
                 onChange={handleFileChange}
               />
+              {formik.touched.profilePic && formik.errors.profilePic ? (
+                <div className="text-red-500">{formik.errors.profilePic}</div>
+              ) : null}
               {formik.values.profilePic && (
                 <img
                   src={
@@ -235,18 +254,8 @@ export const Register = () => {
               Reset
             </Button>
             <Button type="submit">Register</Button>
-
             <Button onClick={() => navigate("/login")}>Back To Login</Button>
           </div>
-          {Object.keys(formik.errors).length > 0 && (
-            <div>
-              {Object.values(formik.errors).map((error, index) => (
-                <p key={index} className="text-red-500 text-sm">
-                  {error}
-                </p>
-              ))}
-            </div>
-          )}
         </form>
         <div className="mt-4 flex justify-center">
           <Button
